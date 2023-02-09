@@ -56,4 +56,5 @@ if [ ! -f /docker/media/sample_960x400_ocean_with_audio.avi ]; then
 wget https://filesamples.com/samples/video/avi/sample_960x400_ocean_with_audio.avi -P /docker/media
 fi
 
+apt install docker-compose
 docker-compose up -d
