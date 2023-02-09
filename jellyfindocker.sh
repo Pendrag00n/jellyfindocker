@@ -40,6 +40,10 @@ services:
     volumes:
       - /docker/media:/media
     restart: 'unless-stopped'
+  filebrowser:
+    image: filebrowser/filebrowser
+    volumes:
+    - /docker/media:/srv
 EOF
 
 apt install wget -y
