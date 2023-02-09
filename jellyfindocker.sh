@@ -21,7 +21,7 @@ fi
 if [ ! -d /docker/media ]; then
     mkdir -p /docker/media
 fi
-chmod 755 /docker/media
+chmod -R 755 /docker/media
 if [ ! -f docker-compose.yml ]; then
     touch docker-compose.yml
 elif [ -f docker-compose.yml ]; then
@@ -58,3 +58,9 @@ fi
 
 apt install docker-compose
 docker-compose up -d
+if [ $? -eq 0 ]; then
+    echo "Jellyfin instalado correctamente"
+    echo "Abre tu navegador y accede a http://localhost:8096"
+else
+    echo "Algo salió mal al montar el contenedor"
+fi
