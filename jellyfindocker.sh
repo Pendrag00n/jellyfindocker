@@ -63,9 +63,11 @@ fi
 apt install docker-compose
 docker-compose up -d
 if [ $? -eq 0 ]; then
+    echo ""
     echo "Jellyfin instalado correctamente"
     echo "Abre tu navegador y accede a http://localhost:8096"
     echo "Tambien puedes subir archivo a traves de http://localhost:4443"
+    echo ""
 else
     echo "Algo salió mal al montar el contenedor"
 fi
