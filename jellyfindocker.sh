@@ -11,8 +11,7 @@ if ! command -v docker >/dev/null 2>&1; then
     read -r -p "Quieres instalarlo ahora? [y/N] " response
     case "$response" in
        [yY][eE][sS]|[yY]) 
-           curl -fsSL https://get.docker.com -o get-docker.sh
-           sh get-docker.sh
+           curl -fsSL https://get.docker.com -o get-docker.sh && sh ./get-docker.sh
           ;;
        *)
            exit 1
@@ -22,7 +21,7 @@ fi
 if [ ! -d /docker/media ]; then
     mkdir -p /docker/media
 fi
-
+chmod 755 /docker/media
 if [ ! -f docker-compose.yml ]; then
     touch docker-compose.yml
 elif [ -f docker-compose.yml ]; then
