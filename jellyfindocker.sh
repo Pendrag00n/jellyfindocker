@@ -12,7 +12,7 @@ if ! command -v docker >/dev/null 2>&1; then
     case "$response" in
        [yY][eE][sS]|[yY]) 
            curl -fsSL https://get.docker.com -o get-docker.sh
-           sudo sh get-docker.sh
+           sh get-docker.sh
           ;;
        *)
            exit 1
