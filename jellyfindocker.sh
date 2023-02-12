@@ -4,6 +4,10 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
+#VARS:
+ip=$(hostname -I | awk '{ print $1 }')
+#
+
 apt update && apt install curl -y
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -27,6 +31,9 @@ if [ ! -f docker-compose.yml ]; then
 elif [ -f docker-compose.yml ]; then
     echo "Ya existe un archivo docker-compose.yml, borralo y vuelve a ejecutar el script"
     exit 1
+fi
+if [ ! -d /docker/bind ]; then
+    mkdir -p /docker/bind
 fi
 
 cat << EOF > docker-compose.yml
@@ -54,6 +61,48 @@ services:
       - /docker/bind:/etc/bind
 EOF
 
+cat << EOF > /docker/bind/db.julio.local
+;
+; BIND data file for local loopback interface
+;
+$TTL	604800
+@	IN	SOA	julio.local. root.julio.local. (
+			      2		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	IN	NS	julio.local.
+@	IN	A	$ip
+;subdom	IN	A	$ip
+EOF
+
+cat << EOF > /docker/bind/named.conf.local
+//include "/etc/bind/zones.rfc1918";
+zone "julio.local" {
+        type master;
+        file "/etc/bind/db.julio.local";
+};
+EOF
+
+cat << EOF > /docker/bind/named.conf.options
+acl "trusted" {
+	192.168.1.0/24;
+};
+options {
+	directory "/var/cache/bind";
+
+	allow-transfer {none;};
+	allow-query {trusted;};
+	listen-on port 53 {localhost;};
+	recursion no;
+	dnssec-validation auto;
+
+	listen-on-v6 { any; };
+};
+EOF
+
 apt install wget -y
 
 if [ ! -f /docker/media/sample_960x540.mkv ]; then
@@ -71,7 +120,7 @@ fi
 apt install docker-compose
 docker-compose up -d
 if [ $? -eq 0 ]; then
-    ip=$(hostname -I | awk '{ print $1 }')
+    
     echo ""
     echo "Jellyfin instalado correctamente"
     echo "Abre tu navegador y accede a http://$ip:8096"
