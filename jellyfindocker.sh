@@ -42,8 +42,16 @@ services:
     restart: 'unless-stopped'
   filebrowser:
     image: filebrowser/filebrowser
+    container_name: filebrowser
     volumes:
-    - /docker/media:/srv
+      - /docker/media:/srv
+  bind9:
+    image: ubuntu/bind9
+    container_name: bind
+    ports:
+      - 30053:53
+    volumes:
+      - /docker/bind:/etc/bind
 EOF
 
 apt install wget -y
