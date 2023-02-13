@@ -27,7 +27,7 @@ cat << EOF > /etc/bind/db.julio.test
 ;
 ; BIND data file for local loopback interface
 ;
-$TTL	604800
+/$TTL	604800
 @	IN	SOA	julio.test. root.julio.test. (
 			      2		; Serial
 			 604800		; Refresh
