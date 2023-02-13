@@ -46,18 +46,14 @@ zone "julio.test" {
 EOF
 
 cat << EOF > /etc/bind/named.conf.options
-acl "trusted" {
-	192.168.1.0/24;
-};
 options {
+	forwarders { 1.1.1.1 };
 	directory "/var/cache/bind";
-
 	allow-transfer {none;};
 	allow-query {trusted;};
 	listen-on port 53 {localhost;};
 	recursion no;
 	dnssec-validation auto;
-
 	listen-on-v6 { any; };
 };
 EOF
@@ -76,13 +72,12 @@ if [ ! -f /media/sample_960x400_ocean_with_audio.avi ]; then
 wget https://filesamples.com/samples/video/avi/sample_960x400_ocean_with_audio.avi -P /media
 fi
 
-if [ $? -eq 0 ]; then
+systemctl restart bind9
+systemctl restart jellyfin.service
     
     echo ""
     echo "Jellyfin instalado correctamente"
     echo "Abre tu navegador y accede a http://$ip:8096"
     echo ""
     
-else
-    echo "Algo salió mal al montar el contenedor"
-fi
+
