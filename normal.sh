@@ -1,14 +1,17 @@
 #!/bin/sh
+#Comprueba que el script se está lanzando como root
 if [ "$(id -u)" != "0" ]; then
     echo "Este script debe ser ejecutado como root"
     exit 1
 fi
 
 #VARS:
+# Guarda la IP de la maquina en una variable para usarla a traves del script
 ip=$(hostname -I | awk '{ print $1 }')
 #
 
-apt update && apt install curl apt-transport-https bind9 -y
+# Instala el Bind, añade el repositorio de jellyfin y lo instala
+apt update && apt install curl apt-transport-https bind9 bind9-utils bind9-dnsutils -y
 add-apt-repository universe
 wget -O - https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key | sudo apt-key add -
 echo "deb [arch=$( dpkg --print-architecture )] https://repo.jellyfin.org/ubuntu $( lsb_release -c -s ) main" | sudo tee /etc/apt/sources.list.d/jellyfin.list
@@ -34,7 +37,9 @@ $TTL	604800
 ;
 @	IN	NS	julio.test.
 @	IN	A	$ip
-;subdom	IN	A	$ip
+julio.test	IN	A	$ip
+www	IN	A	$ip
+ns1	IN	A	$ip
 EOF
 
 cat << EOF > /etc/bind/named.conf.local
@@ -47,14 +52,12 @@ EOF
 
 cat << EOF > /etc/bind/named.conf.options
 options {
-	forwarders { 1.1.1.1 };
+	forwarders { 1.1.1.1; };
 	directory "/var/cache/bind";
-	allow-transfer {none;};
-	allow-query {trusted;};
-	listen-on port 53 {localhost;};
-	recursion no;
+	allow-query { any; };
+	listen-on port 53 { localhost; $ip ;};
+	recursion yes;
 	dnssec-validation auto;
-	listen-on-v6 { any; };
 };
 EOF
 
@@ -78,6 +81,7 @@ systemctl restart jellyfin.service
     echo ""
     echo "Jellyfin instalado correctamente"
     echo "Abre tu navegador y accede a http://$ip:8096"
+    echo "Tambien puedes configurar $ip como DNS y acceder a traves de www.julio.test:8096
     echo ""
     
 
