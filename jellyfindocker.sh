@@ -1,15 +1,18 @@
 #!/bin/sh
+#Comprueba que el script se está lanzando como root
 if [ "$(id -u)" != "0" ]; then
     echo "Este script debe ser ejecutado como root"
     exit 1
 fi
 
 #VARS:
+# Guarda la IP de la maquina en una variable para usarla a traves del script
 ip=$(hostname -I | awk '{ print $1 }')
 #
 
 apt update && apt install curl -y
 
+# Comprueba si docker está instalado, si no está instalado hace un case donde te da la opción de instalarlo automaticamente
 if ! command -v docker >/dev/null 2>&1; then
 echo ""
     echo "DOCKER NO ESTÁ INSTALADO"
@@ -23,6 +26,8 @@ echo ""
           ;;
     esac
 fi
+
+#Crea los archivos y carpetas necesarias con sus respectivos permisos
 if [ ! -d /docker/media ]; then
     mkdir -p /docker/media
 fi
@@ -37,6 +42,7 @@ if [ ! -d /docker/bind ]; then
     mkdir -p /docker/bind
 fi
 
+# Introduce la configuración en sus respectivos archivos
 cat << EOF > docker-compose.yml
 version: '3.5'
 services:
@@ -101,6 +107,7 @@ EOF
 
 apt install wget -y
 
+# Descarga videos de prueba en distintos formatos para la comprobación
 if [ ! -f /docker/media/sample_960x540.mkv ]; then
     wget https://filesamples.com/samples/video/mkv/sample_960x540.mkv -P /docker/media
 fi
@@ -113,6 +120,7 @@ if [ ! -f /docker/media/sample_960x400_ocean_with_audio.avi ]; then
 wget https://filesamples.com/samples/video/avi/sample_960x400_ocean_with_audio.avi -P /docker/media
 fi
 
+# Monta el docker-compose y comprueba si se ha ejecutado correctamente, en cuyo caso nos indica como acceder al servicio
 apt install docker-compose
 docker-compose up -d
 if [ $? -eq 0 ]; then
@@ -120,7 +128,6 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "Jellyfin instalado correctamente"
     echo "Abre tu navegador y accede a http://$ip:8096"
-    echo "Tambien puedes subir archivo a traves de http://$ip:4443"
     echo ""
 else
     echo "Algo salió mal al montar el contenedor"
