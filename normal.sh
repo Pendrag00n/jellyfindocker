@@ -83,5 +83,3 @@ systemctl restart jellyfin.service
     echo "Abre tu navegador y accede a http://$ip:8096"
     echo "Tambien puedes configurar $ip como DNS y acceder a traves de www.julio.test:8096
     echo ""
-    
-
