@@ -11,8 +11,9 @@ ip=$(hostname -I | awk '{ print $1 }')
 apt update && apt install curl -y
 
 if ! command -v docker >/dev/null 2>&1; then
-    echo "Docker no está instalado"
-    read -r -p "Quieres instalarlo ahora? [y/N] " response
+echo ""
+    echo "DOCKER NO ESTÁ INSTALADO"
+    read -r -p "QUIERES INSTALARLO AHORA? [y/N] " response
     case "$response" in
        [yY][eE][sS]|[yY]) 
            curl -fsSL https://get.docker.com -o get-docker.sh && sh ./get-docker.sh
@@ -47,16 +48,11 @@ services:
     volumes:
       - /docker/media:/media
     restart: 'unless-stopped'
-  filebrowser:
-    image: filebrowser/filebrowser
-    container_name: filebrowser
-    volumes:
-      - /docker/media:/srv
   bind9:
     image: ubuntu/bind9
     container_name: bind
     ports:
-      - 30053:53
+      - "30053:53"
     volumes:
       - /docker/bind:/etc/bind
 EOF
